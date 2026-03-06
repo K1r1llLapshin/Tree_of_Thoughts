@@ -1,4 +1,4 @@
-EVALUATOR_PROMT ='''You are a rigorous and objective Evaluator. Your task is to assess the proposed step in solving the problem.
+EVALUATOR_PROMPT ='''You are a rigorous and objective Evaluator. Your task is to assess the proposed step in solving the problem.
 Evaluate how logical the current thought is and how much closer it brings us to the correct final answer.
 
 Original Problem: {problem}
