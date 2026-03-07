@@ -24,6 +24,10 @@ class BFS(Search):
         self.all_thoughts.append(root) # Добавление кореня в логи
         
         for depth in range(self.max_depth):
+            
+            if current_level_thoughts[0].score >= 1.0:
+                break
+            
             new_candidates = []
             
             for parent_thought in current_level_thoughts:
@@ -39,13 +43,11 @@ class BFS(Search):
                 
                 # Обновление глобальных статистк
                 self.total_tokens += response_data["tokens"]
-                self.total_price += response_data["price"]
                 
                 raw_thoughts = response_data["text"]
                 thoughts_texts = self._parse_thoughts(raw_thoughts)
 
-                # Распределение времени/стоимост генерации поровну между новыми мыслями
-                gen_price_per_thought = response_data["price"] / max(len(thoughts_texts), 1)
+                # Распределение времени генерации поровну между новыми мыслями
                 gen_time_per_thought = response_data["time"] / max(len(thoughts_texts), 1)
 
                 # Создание мыслей и оценка 
@@ -53,7 +55,6 @@ class BFS(Search):
                     child = Thought(state=text, role="thought", parent=parent_thought)
                     
                     # Присваиваем долю ресурсов, затраченных на генерацию
-                    child.price += gen_price_per_thought
                     child.time += gen_time_per_thought
                     
                     score, feedback = self._evaluate(problem, child)
@@ -62,11 +63,6 @@ class BFS(Search):
                     new_candidates.append(child)
                     
                     self.all_thoughts.append(child) # Сохраняем в общий лог
-                    
-                    if score >= 1.0:
-                        ans = self._get_final_answer(problem, child)
-                        self.save_logs() # Сохраняем логи перед выходом
-                        return ans
 
             # Сортировка и выбор лучших мыслей по оценке
             new_candidates.sort(key=lambda x: x.score, reverse=True)

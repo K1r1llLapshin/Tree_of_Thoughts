@@ -1,24 +1,22 @@
 import re
 import uuid
-import os
 import json
 import time
 from typing import List
 from core.thought import Thought
 from core.prompts.generate_thought import SUMMARY_PROMPT
 from core.prompts.evaluator_thought import EVALUATOR_PROMPT
+from core.visualizer import visualize_thoughts_tree
 
 class Search:
     def __init__(self):
         '''
         all_thoughts: список всех мыслей
         total_tokens: общее количество токенов
-        total_price: общая стоимость генерации
         start_time: время начала поиска
         '''
         self.all_thoughts = []
         self.total_tokens = 0
-        self.total_price = 0.0
         self.start_time = time.time()
         
     def _evaluate(self, problem: str, thought: Thought):
@@ -36,10 +34,8 @@ class Search:
         
         # Обновляем глобальную статистику
         self.total_tokens += response_data["tokens"]
-        self.total_price += response_data["price"]
         
         # Добавляем время и стоимость оценки к самой мысли
-        thought.price += response_data["price"]
         thought.time += response_data["time"]
         
         score = 0.0
@@ -70,11 +66,9 @@ class Search:
         
         # Обновление глобальных статистк
         self.total_tokens += ans["tokens"]
-        self.total_price += ans["price"]
         raw_thoughts = ans["text"]
         
         child = Thought(state=raw_thoughts, role="final_answer", parent=best_thought)
-        child.price = ans["price"]
         child.time = ans["time"]
         
         score, feedback = self._evaluate(problem, child)
@@ -85,14 +79,13 @@ class Search:
     
     def save_logs(self):
         """Сохраняет собранную информацию в JSON файл"""
-        filename = f"./logs/search_logs_{uuid.uuid4()}.json"
+        filename = f"D:/Tree_of_Thoughts/logs/json/search_logs_{uuid.uuid4()}.json"
         total_time = time.time() - self.start_time
         
         log_data = {
             "general_information": [
                 {
                     "count_thoughts": len(self.all_thoughts),
-                    "total_price": round(self.total_price, 6),
                     "total_tokens": self.total_tokens,
                     "total_time": round(total_time, 2)
                 }
@@ -102,6 +95,9 @@ class Search:
         
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(log_data, f, ensure_ascii=False, indent=4)
+        
+        visualize_thoughts_tree(filename)
+        
     
     
     

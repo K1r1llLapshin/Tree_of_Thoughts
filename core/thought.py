@@ -10,9 +10,6 @@ class Thought:
         self.children: List[Thought] = []
         self.score = 0.0            # Оценка 
         self.feedback = ""          # Текстовое обоснование оценки от ИИ
-        
-        # Данные для логов
-        self.price = 0.0
         self.time = 0.0
 
     def set_score(self, score: float, feedback: str):
@@ -46,7 +43,6 @@ class Thought:
             "state": self.state,
             "score": self.score,
             "feedback": self.feedback,
-            "price": round(self.price, 6),
             "time": round(self.time, 2),
             "parent": self.parent.id if self.parent else None
         }

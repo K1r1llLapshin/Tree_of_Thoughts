@@ -44,13 +44,11 @@ class DFS(Search):
         
         # Обновление глобальных статистик
         self.total_tokens += response["tokens"]
-        self.total_price += response["price"]
         
         raw_thoughts_text = response["text"]
         thoughts_texts = self._parse_thoughts(raw_thoughts_text)
 
-        # Распределение времени/стоимости генерации поровну между новыми мыслями
-        gen_price_per_thought = response["price"] / max(len(thoughts_texts), 1)
+        # Распределение времени генерации поровну между новыми мыслями
         gen_time_per_thought = response["time"] / max(len(thoughts_texts), 1)
 
         
@@ -60,7 +58,6 @@ class DFS(Search):
             child = Thought(state=text, role="thought", parent=current_thought)
         
             # Присваиваем долю ресурсов, затраченных на генерацию
-            child.price += gen_price_per_thought
             child.time += gen_time_per_thought
             
             score, feedback = self._evaluate(problem, child)

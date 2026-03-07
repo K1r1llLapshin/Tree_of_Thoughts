@@ -37,20 +37,15 @@ class LLMClient:
             completion_tokens = response.usage.completion_tokens
             total_tokens = response.usage.total_tokens
             
-            # Примерный расчет стоимости 
-            price = (prompt_tokens * 53.76 / 1_000_000) + (completion_tokens * 80.64 / 1_000_000) # 53.76 руб. за 1M токенов ввода, 80.64 руб. за 1M вывода (06.03.2026)
-
             return {
                 "text": response.choices[0].message.content,
                 "tokens": total_tokens,
-                "price": price,
                 "time": end_time - start_time
             }
         except Exception as e:
             return {
                 "text": f"ОШИБКА: {str(e)}", 
                 "tokens": 0, 
-                "price": 0.0, 
                 "time": time.time() - start_time
             }
 
