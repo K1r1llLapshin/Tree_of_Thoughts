@@ -1,0 +1,60 @@
+{
+    "parameters": [
+        {
+            "name_search": "BFS",
+            "count_thoughts": 3,
+            "breadth_limit": 2,
+            "max_depth": 3
+        }
+    ],
+    "general_information": [
+        {
+            "count_thoughts": 5,
+            "total_tokens": 1201,
+            "total_time": 11.58
+        }
+    ],
+    "brief_summary": [
+        {
+            "question": "Сколько будет 2+2*2",
+            "answer": "The correct answer is **6**."
+        }
+    ],
+    "thoughts": [
+        {
+            "id": "60ef021a-f867-4c43-9a05-9a87b446ba73",
+            "role": "root",
+            "state": "Сколько будет 2+2*2",
+            "score": 0.0,
+            "parent": null
+        },
+        {
+            "id": "e026e312-72f3-410f-89b3-7b85739252a2",
+            "role": "thought",
+            "state": "Identify the mathematical operations involved in the expression \"2+2*2\".",
+            "score": 0.0,
+            "parent": "60ef021a-f867-4c43-9a05-9a87b446ba73"
+        },
+        {
+            "id": "49e23f35-fb29-4693-958c-302f0a117168",
+            "role": "thought",
+            "state": "Apply the order of operations (PEMDAS/BODMAS rules), which prioritize multiplication over addition.",
+            "score": 0.0,
+            "parent": "60ef021a-f867-4c43-9a05-9a87b446ba73"
+        },
+        {
+            "id": "7736b790-b585-434b-a30b-db11a94cb01a",
+            "role": "thought",
+            "state": "Perform the multiplication first (2*2=4), then the addition (2+4=6) to arrive at the final result.",
+            "score": 1.0,
+            "parent": "60ef021a-f867-4c43-9a05-9a87b446ba73"
+        },
+        {
+            "id": "4e2e55cf-3956-4f68-9291-4fe064330085",
+            "role": "final_answer",
+            "state": "The correct answer is **6**.",
+            "score": 1.0,
+            "parent": "7736b790-b585-434b-a30b-db11a94cb01a"
+        }
+    ]
+}

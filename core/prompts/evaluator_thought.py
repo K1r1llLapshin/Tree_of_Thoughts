@@ -11,6 +11,8 @@ Use a strict scale from 0.0 to 1.0:
 0.7 - 0.9: Strong, logical step clearly leading toward the solution.
 1.0: Perfect step that fully completes the solution (final answer reached).
 
-Your response must contain only the score and a brief justification in this strict format:
-SCORE: [number from 0.0 to 1.0]
-FEEDBACK: [1-2 sentences explaining the score]''' 
+Your response must contain only the score:
+SCORE: [number from 0.0 to 1.0]''' 
+
+
+

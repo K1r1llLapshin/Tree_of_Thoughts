@@ -4,18 +4,15 @@ from typing import List, Optional
 class Thought:
     def __init__(self, state: str, role: str, parent: Optional['Thought'] = None):
         self.id = str(uuid.uuid4()) # Уникальный ID мысли
-        self.role = role       # Текст мысли
+        self.role = role       # Роль мысли
         self.state = state          # Текст мысли
         self.parent = parent        # Ссылка на узел выше
-        self.children: List[Thought] = []
+        self.children: List[Thought] = [] # Список дочерних узлов
         self.score = 0.0            # Оценка 
-        self.feedback = ""          # Текстовое обоснование оценки от ИИ
-        self.time = 0.0
 
-    def set_score(self, score: float, feedback: str):
+    def set_score(self, score: float):
         """Устанавливает оценку"""
         self.score = score
-        self.feedback = feedback
     
     def set_parent(self, parent: 'Thought'):
         """Устанавливает родительский узел"""
@@ -42,7 +39,5 @@ class Thought:
             "role": self.role,
             "state": self.state,
             "score": self.score,
-            "feedback": self.feedback,
-            "time": round(self.time, 2),
             "parent": self.parent.id if self.parent else None
         }

@@ -25,8 +25,8 @@ class DFS(Search):
         # Запуск поиска
         target_thought = self._search(problem, root, 0)
         ans = self._get_final_answer(problem, target_thought)    
-        self.save_logs() # Сохраняем логи перед выходом
-        return ans
+        filename_json, filename_png = self.save_logs("DFS", self.count_thoughts, self.max_depth, self.threshold, problem, ans) # Сохраняем логи перед выходом
+        return ans, filename_json, filename_png
 
     def _search(self, problem: str, current_thought: Thought, depth: int) -> None:
          # Выбирается промт для каждого уровня 
@@ -48,28 +48,21 @@ class DFS(Search):
         raw_thoughts_text = response["text"]
         thoughts_texts = self._parse_thoughts(raw_thoughts_text)
 
-        # Распределение времени генерации поровну между новыми мыслями
-        gen_time_per_thought = response["time"] / max(len(thoughts_texts), 1)
-
-        
         candidates = []
         # Создание мыслей и оценка 
         for text in thoughts_texts:
             child = Thought(state=text, role="thought", parent=current_thought)
-        
-            # Присваиваем долю ресурсов, затраченных на генерацию
-            child.time += gen_time_per_thought
             
-            score, feedback = self._evaluate(problem, child)
-            child.set_score(score, feedback)
+            score = self._evaluate(problem, child)
+            child.set_score(score)
             candidates.append(child)
                     
             self.all_thoughts.append(child) # Сохраняем в общий лог
 
         candidates.sort(key=lambda x: x.score, reverse=True)
-
+        
         for candidate in candidates:
-            if candidate.score >= 1.0:
+            if candidate.score == 1.0:
                 return candidate
 
             if candidate.score >= self.threshold:

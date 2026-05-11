@@ -44,21 +44,15 @@ class BFS(Search):
                 # Обновление глобальных статистк
                 self.total_tokens += response_data["tokens"]
                 
-                raw_thoughts = response_data["text"]
+                raw_thoughts = response_data["text"] 
                 thoughts_texts = self._parse_thoughts(raw_thoughts)
-
-                # Распределение времени генерации поровну между новыми мыслями
-                gen_time_per_thought = response_data["time"] / max(len(thoughts_texts), 1)
-
+                
                 # Создание мыслей и оценка 
                 for text in thoughts_texts:
                     child = Thought(state=text, role="thought", parent=parent_thought)
                     
-                    # Присваиваем долю ресурсов, затраченных на генерацию
-                    child.time += gen_time_per_thought
-                    
-                    score, feedback = self._evaluate(problem, child)
-                    child.set_score(score, feedback)
+                    score = self._evaluate(problem, child)
+                    child.set_score(score)
                     parent_thought.add_child(child)
                     new_candidates.append(child)
                     
@@ -69,8 +63,8 @@ class BFS(Search):
             current_level_thoughts = new_candidates[:self.breadth_limit]
        
         ans = self._get_final_answer(problem, current_level_thoughts[0])    
-        self.save_logs()
-        return ans
+        filename_json, filename_png = self.save_logs("BFS", self.count_thoughts, self.breadth_limit, self.max_depth, problem, ans)
+        return ans, filename_json, filename_png
  
 
 

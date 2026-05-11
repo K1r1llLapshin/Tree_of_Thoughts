@@ -19,7 +19,7 @@ class Search:
         self.total_tokens = 0
         self.start_time = time.time()
         
-    def _evaluate(self, problem: str, thought: Thought):
+    def _evaluate(self, problem: str, thought: Thought) -> float:
         '''Оценщик мысли'''
         history = "\n".join(thought.parent.get_path()) if thought.parent else "Начало"
         prompt = EVALUATOR_PROMPT.format(
@@ -28,7 +28,7 @@ class Search:
             current_thought=thought.state
         )
         
-       # Получаем словарь с данными
+        # Получаем словарь с данными
         response_data = self.client.generate(prompt)
         text = response_data["text"]
         
@@ -36,20 +36,15 @@ class Search:
         self.total_tokens += response_data["tokens"]
         
         # Добавляем время и стоимость оценки к самой мысли
-        thought.time += response_data["time"]
         
         score = 0.0
-        feedback = ""
         
         score_match = re.search(r"SCORE:\s*([\d.]+)", text)
-        feedback_match = re.search(r"FEEDBACK:\s*(.*)", text, re.DOTALL)
         
         if score_match:
             score = float(score_match.group(1))
-        if feedback_match:
-            feedback = feedback_match.group(1).strip()
-        
-        return score, feedback
+    
+        return score
 
 
     def _parse_thoughts(self, text: str) -> List[str]:
@@ -69,20 +64,32 @@ class Search:
         raw_thoughts = ans["text"]
         
         child = Thought(state=raw_thoughts, role="final_answer", parent=best_thought)
-        child.time = ans["time"]
         
-        score, feedback = self._evaluate(problem, child)
-        child.set_score(score, feedback)
+        score = self._evaluate(problem, child)
+        child.set_score(score)
         best_thought.add_child(child)
         self.all_thoughts.append(child) # Сохраняем в общий лог
         return raw_thoughts.strip()
     
-    def save_logs(self):
+    def save_logs(self, name_search: str, count_thoughts: int, breadth_limit_or_threshold: int, max_depth: int, problem: str, answer: str) -> str:
         """Сохраняет собранную информацию в JSON файл"""
-        filename = f"D:/Tree_of_Thoughts/logs/json/search_logs_{uuid.uuid4()}.json"
+        filename_json = f"D:/Tree_of_Thoughts/logs/json/search_logs_{uuid.uuid4()}.json"
         total_time = time.time() - self.start_time
         
+        if (name_search == "BFS"):
+            name_breadth_limit_or_threshold = "breadth_limit"
+        else:
+            name_breadth_limit_or_threshold = "threshold"
+            
         log_data = {
+            "parameters": [
+                {
+                    "name_search": name_search,
+                    "count_thoughts": count_thoughts,
+                    name_breadth_limit_or_threshold: breadth_limit_or_threshold,
+                    "max_depth": max_depth
+                }
+            ],
             "general_information": [
                 {
                     "count_thoughts": len(self.all_thoughts),
@@ -90,13 +97,21 @@ class Search:
                     "total_time": round(total_time, 2)
                 }
             ],
+            "brief_summary": [
+                {
+                    "question": problem,
+                    "answer": answer
+                }   
+            ],
             "thoughts": [thought.to_dict() for thought in self.all_thoughts]
         }
         
-        with open(filename, 'w', encoding='utf-8') as f:
+        with open(filename_json, 'w', encoding='utf-8') as f:
             json.dump(log_data, f, ensure_ascii=False, indent=4)
         
-        visualize_thoughts_tree(filename)
+        filename_png = visualize_thoughts_tree(filename_json)
+        return filename_json, filename_png
+        
         
     
     

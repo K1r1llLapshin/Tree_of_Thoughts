@@ -3,7 +3,7 @@ import textwrap
 import re
 from graphviz import Digraph
 
-def visualize_thoughts_tree(json_path):
+def visualize_thoughts_tree(json_path) -> str:
     '''Визуализация дерева мыслей'''
 
     with open(json_path, 'r', encoding='utf-8') as f:
@@ -11,9 +11,9 @@ def visualize_thoughts_tree(json_path):
 
     # Высокое качество и стиль оформления
     dot = Digraph(comment='Thoughts Tree', format='png')
-    dot.attr(dpi='300')
-    dot.attr('node', shape='box', style='filled', fillcolor="#636363", fontname='Times New Roman', fontsize='12')
-    dot.attr('edge', fontname='Times New Roman', fontsize='10')
+    dot.attr(dpi='600')
+    dot.attr('node', shape='box', style='filled', fillcolor="#636363", fontsize='12')
+    dot.attr('edge', fontsize='10')
 
     # Общая информация в верхнем левом углу 
     gen_info = data.get('general_information', [{}])[0]
@@ -31,16 +31,13 @@ def visualize_thoughts_tree(json_path):
         score = node.get('score', 0)
     
         state_raw = node['state'].strip().replace('\n', ' ').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-        feedback_raw = node.get('feedback', '').strip().replace('\n', ' ').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
         
         state_wrapped = textwrap.fill(state_raw, width=60).replace('\n', '<BR/>')
-        feedback_wrapped = textwrap.fill(feedback_raw, width=60).replace('\n', '<BR/>') if feedback_raw else "No feedback"
         
         label = f'''<
             <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
                 <TR><TD BGCOLOR="#E0E0E0"><B>{role}</B> (Score: {score})</TD></TR>
                 <TR><TD ALIGN="LEFT"><B>Thought:</B><BR/>{state_wrapped}</TD></TR>
-                <TR><TD ALIGN="LEFT" BGCOLOR="#F0F8FF"><B>Analysis &amp; Evaluation:</B><BR/><I>{feedback_wrapped}</I></TD></TR>
             </TABLE>
         >'''
         
@@ -55,3 +52,4 @@ def visualize_thoughts_tree(json_path):
             
     filename = 'D:/Tree_of_Thoughts/logs/img/thoughts_tree_' + re.sub(r'^search_logs_|\.json$', '', json_path.split('/')[-1])
     dot.render(filename, cleanup=True)
+    return filename

@@ -1,5 +1,4 @@
 import os
-import time
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -23,30 +22,24 @@ class LLMClient:
         )
     
     def generate(self, prompt: str) -> dict:
-        start_time = time.time()
         try:
             response = self.client.chat.completions.create(
                 model=self.model_name,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=self.temperature,
             )
-            end_time = time.time()
             
             # Получаем токены из ответа API
-            prompt_tokens = response.usage.prompt_tokens
-            completion_tokens = response.usage.completion_tokens
             total_tokens = response.usage.total_tokens
             
             return {
                 "text": response.choices[0].message.content,
-                "tokens": total_tokens,
-                "time": end_time - start_time
+                "tokens": total_tokens
             }
         except Exception as e:
             return {
                 "text": f"ОШИБКА: {str(e)}", 
-                "tokens": 0, 
-                "time": time.time() - start_time
+                "tokens": 0
             }
 
 
